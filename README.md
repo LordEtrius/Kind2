@@ -1,45 +1,51 @@
 Kind2
 =====
 
-Kind2 is a pure functional, lazy, non-garbage-collected, general-purpose,
-dependently typed programming language focusing on performance and usability. It
-features a blazingly fast type-checker based on **optimal
-[normalization-by-evaluation](https://en.wikipedia.org/wiki/Normalisation_by_evaluation)**. It can also
-compile programs to [HVM](https://github.com/kindelia/hvm) and [Kindelia](https://github.com/kindelia/kindelia),
-and can be used to prove and verify mathematical theorems.
+**Kind2** is is a **functional programming language** and **proof assistant** that is **lazy**,
+**non-garbage-collected** and **massively parallel**. 
+
+It is entirely based on [HVM](https://github.com/kindelia/hvm), a massively parallel runtime, making it astonishingly
+fast. Its type-checker outperforms every other proof assistant on the market, and its runtime competes with Haskell's
+GHC, often offering significant speedups. In short, Kind2 is as high-level as [Haskell](https://www.haskell.org/), as
+memory efficient as [Rust](https://www.rust-lang.org/), and as strongly-typed as
+[Agda](https://wiki.portal.chalmers.se/agda/pmwiki.php)'s, and it aims to become the ultimate programming language of
+the next century. For direct comparisons, check our [functional
+benchmarks](https://github.com/kindelia/functional-benchmarks) repository.
+
+**Welcome to the inevitable parallel, functional future of computers!**
 
 Examples
 --------
 
-Pure functions can be defined using an equational notation that resembles [Haskell](https://www.haskell.org/):
+Pure functions are defined via equations, as in [Haskell](https://www.haskell.org/):
 
-```idris
-List.map <a: Type> <b: Type> (x: (List a)) (f: (x: a) b) : (List b)
-List.map a b (Nil t)       f = (Nil b)
-List.map a b (Cons t x xs) f = (Cons b (f x) (List.map xs f))
+```javascript
+// Applies a function to every element of a list
+map <a> <b> (list: List a) (f: a -> b) : List b
+map a b Nil              f = Nil
+map a b (Cons head tail) f = Cons (f x) (map tail f)
 ```
 
-Mathematical theorems can be proved via inductive reasoning, as in [Idris](https://www.idris-lang.org/) and [Agda](https://wiki.portal.chalmers.se/agda/pmwiki.php):
+Side-effective programs are written via monadic monads, resembling [Rust](https://www.rust-lang.org/) and [TypeScript](https://www.typescriptlang.org/):
 
-```idris
-Nat.commutes (a: Nat) (b: Nat) : (Nat.add a b) == (Nat.add b a)
-Nat.commutes Zero     b = (Nat.comm.a b)
-Nat.commutes (Succ a) b =
-  let e0 = (Equal.apply @x(Succ x) (Nat.commutes a b))
-  let e1 = (Equal.mirror (Nat.commutes.b b a))
-  (Equal.chain e0 e1)
-```
-
-Normal programs can be written in a monadic syntax that is inspired by [Rust](https://www.rust-lang.org/) and [TypeScript](https://www.typescriptlang.org/):
-
-```idris
-Main : (IO (Result () String)) {
-  ask limit = (IO.prompt "Enter limit:")
+```javascript
+// Prints the double of every numbet up to a limit
+Main : IO (Result () String) {
+  ask limit = IO.prompt "Enter limit:"
   for x in (List.range limit) {
-    (IO.print "{} * 2 = {}" x (Nat.double x))
+    IO.print "{} * 2 = {}" x (Nat.double x)
   }
-  return (Ok ())
+  return Ok ()
 }
+```
+
+Theorems can be proved inductivelly, as in [Agda](https://wiki.portal.chalmers.se/agda/pmwiki.php) and [Idris](https://www.idris-lang.org/):
+
+```idris
+// Black Friday Theorem. Proof that, for every Nat n: n * 2 / 2 == n.
+Nat.black_friday_theorem (n: Nat) : Equal Nat (Nat.half (Nat.double n)) n
+Nat.black_friday_theorem Nat.zero     = Equal.refl
+Nat.black_friday_theorem (Nat.succ n) = Equal.apply (x => Nat.succ x) (Nat.black_friday_theorem n)
 ```
 
 For more examples, check the [Wikind](https://github.com/kindelia/wikind).
@@ -64,9 +70,4 @@ Check      | `kind2 check  file.kind2` | Checks all definitions.
 Eval       | `kind2 eval   file.kind2` | Runs using the type-checker's evaluator.
 Run        | `kind2 run    file.kind2` | Runs using HVM's evaluator, on Rust-mode.
 To-HVM     | `kind2 to-hvm file.kind2` | Generates a [.hvm](https://github.com/kindelia/hvm) file. Can then be compiled to C.
-To-KDL     | `kind2 to-kdl file.kind2` | Generates a [.kdl](https://github.com/kindelia/kindelia) file. Can then be deployed to Kindelia.
-
-Benchmarks
-----------
-
-In preliminary [benchmarks](/bench), Kind2's type-checker has outperformed Agda, Idris by 90x to 900x, which is an expressive difference. That said, we only tested a few small programs, so there isn't enough data to draw a conclusion yet. We're working on a more extensive benchmark suite. 
+To-KDL     | `kind2 to-kdl file.kind2` | Generates a [.kdl](https://github.com/kindelia/kindelia) file. Can then be deployed to [Kindelia](https://github.com/kindelia/kindelia).
